@@ -3,6 +3,10 @@ var express = require('express'),
       askph = require('./lib/askph.js'),
       chalk = require('chalk');
 
+// Load env file is needed
+var env = require('node-env-file');
+env(__dirname + '/.env');
+
 // Listen for the feed URL
 app.get('/feed', function (req, res) {
   console.log('REQ: Request for feed received');

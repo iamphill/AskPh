@@ -1,5 +1,4 @@
 {
-  "client_id": "c8faae8860b0c7f921d301019ff19830",
   "playlist_id": "72096464",
   "endpoint": "http://api.soundcloud.com/playlists/[PLAYLIST_ID].json?client_id=[CLIENT_ID]",
 
