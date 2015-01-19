@@ -9,6 +9,7 @@ if (process.env['client_id'] == undefined) {
   env(__dirname + '/.env');
 }
 
+app.use(express.static(process.cwd() + '/public'));
 // Listen for the feed URL
 app.get('/feed', function (req, res) {
   console.log('REQ: Request for feed received');
@@ -27,11 +28,6 @@ app.get('/:track_id.mp3', function (req, res) {
   console.log('REQ: Request for track ID `%s` received', req.params.track_id);
 
   request(url).pipe(res);
-});
-
-app.get('/', function (req, res) {
-  console.log('REQ: Index page requested. ' + chalk.red('404'));
-  res.status(404).send('404z! Better try again on another URL');
 });
 
 // Start server
