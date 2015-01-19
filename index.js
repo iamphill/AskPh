@@ -1,9 +1,12 @@
 var express = require('express'),
         app = express(),
-      askph = require('./lib/askph.js');
+      askph = require('./lib/askph.js'),
+      chalk = require('chalk');
 
 // Listen for the feed URL
 app.get('/feed', function (req, res) {
+  console.log('REQ: Request for feed received');
+
   // Create new class
   new askph(req, res);
 });
@@ -15,13 +18,27 @@ app.get('/:track_id.mp3', function (req, res) {
 
   var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + settings['client_id'];
 
+  console.log('REQ: Request for track ID `%s` received', req.params.track_id);
+
   request(url).pipe(res);
 });
 
+app.get('/', function (req, res) {
+  console.log('REQ: Index page requested. ' + chalk.red('404'));
+  res.status(404).send('404z! Better try again on another URL');
+});
+
 // Start server
+console.log(chalk.green('#AskPh Podcast Feed'));
+console.log('==========\n');
+console.log('Starting app...');
+
 var server = app.listen(process.env.PORT || 3000, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('askph podcast app listening at http://%s:%s', host, port);
+  console.log('\nApplication has started.');
+  console.log('Listening on port %s', port);
+  console.log('Enjoy!\n');
+  console.log('Logging requests received:');
 });

@@ -5,11 +5,12 @@
 
   "title": "#AskPh",
   "itunes_sub": "AskPh subtitle",
+  "itunes_summary": "AskPH Summary",
   "description": "AskPH",
   "itunes_user": "Ph.Creative",
   "itunes_email": "rob@ph-creative.com",
   "itunes_image": "http://www.ph-creative.com/images/ph-logo.png",
   "language": "en",
-  "itunes_cat": "Technology",
+  "itunes_cat": ["Technology", "Some other", "Some other 2"],
   "itunes_keywords": "social"
 }
