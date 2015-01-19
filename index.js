@@ -15,9 +15,7 @@ app.get('/:track_id.mp3', function (req, res) {
 
   var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + settings['client_id'];
 
-  request.get(url, function (error, response, body) {
-    res.end(body);
-  });
+  request(url).pipe(res);
 });
 
 // Start server
