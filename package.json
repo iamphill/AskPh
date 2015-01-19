@@ -18,5 +18,8 @@
   "license": "MIT",
   "engines": {
     "iojs": "1.0.x"
+  },
+  "scripts": {
+    "start": "iojs index"
   }
 }
