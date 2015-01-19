@@ -29,16 +29,16 @@ app.get('/', function (req, res) {
 });
 
 // Start server
-console.log(chalk.green('#AskPh Podcast Feed'));
-console.log('==========\n');
-console.log('Starting app...');
+console.log('app: ' + chalk.green('#AskPh Podcast Feed'));
+console.log('app: ' + '==========\napp: ');
+console.log('app: ' + ' ~~~> Starting app...');
 
 var server = app.listen(process.env.PORT || 3000, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('\nApplication has started.');
-  console.log('Listening on port %s', port);
-  console.log('Enjoy!\n');
-  console.log('Logging requests received:');
+  console.log('app: ' + '\napp:  ~~~> Application has started.');
+  console.log('app: ' + ' ~~~> Listening on port %s', port);
+  console.log('app: ' + ' ~~~> Enjoy!\napp: ');
+  console.log('app: ' + ' ~~~> Logging requests received:');
 });
