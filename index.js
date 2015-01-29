@@ -23,10 +23,9 @@ app.get('/:track_id.mp3', function (req, res) {
   var settings = require('./lib/settings.json');
   var fs = require('fs');
 
-  var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + settings['client_id'];
-
+  var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + process.env['client_id'];
   console.log('REQ: Request for track ID `%s` received', req.params.track_id);
-
+  
   request(url).pipe(res);
 });
 
