@@ -27,7 +27,7 @@ app.get('/:track_id.mp3', function (req, res) {
   var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + process.env['client_id'];
   console.log('REQ: Request for track ID `%s` received', req.params.track_id);
 
-  if (typeof req.headers.range !== 'undefined' && req.headers.range !== 'bytes=0-') {
+  /*if (typeof req.headers.range !== 'undefined' && req.headers.range !== 'bytes=0-') {
     function complete() {
       var range = req.headers.range;
       var total = data.length;
@@ -57,7 +57,9 @@ app.get('/:track_id.mp3', function (req, res) {
     } 
   } else {
     request(url).pipe(res);
-  } 
+  }*/
+
+  req.pipe(request(url)).pipe(res);
 });
 
 // Start server
