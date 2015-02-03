@@ -38,15 +38,7 @@ app.get('/:track_id.mp3', function (req, res) {
 });
 
 // Get the video
-app.get('/:video_id.MP4', function (req, res) {
-  var request = require('request');
-  var querystring = require('querystring');
-  var settings = require('./lib/settings.json');
-  var id = req.params.video_id;
-  var url = settings['videoinfo'] + id
-
-  console.log('REQ: Request for video ID `%s` received', id);
-
+var streamVideo = function (req, res, url, request, querystring) {
   request(url, function (err, response, body) {
     var qstring = querystring.parse(body);
     var videoString = querystring.parse(qstring['url_encoded_fmt_stream_map']);
@@ -56,10 +48,25 @@ app.get('/:video_id.MP4', function (req, res) {
       videoUrl = videoUrl[2];
     }
 
-    req.pipe(request(videoUrl)).pipe(res, {
-      end: false
+    request.get(videoUrl).on('response', function (respon) {
+      if (respon.statusCode === 403) {
+        streamVideo(req, res, url, request, querystring);
+      } else {
+        req.pipe(request(videoUrl)).pipe(res);
+      }
     });
   });
+};
+app.get('/:video_id.MP4', function (req, res) {
+  var request = require('request');
+  var querystring = require('querystring');
+  var settings = require('./lib/settings.json');
+  var id = req.params.video_id;
+  var url = settings['videoinfo'] + id + '&asv=3';
+
+  console.log('REQ: Request for video ID `%s` received', id);
+
+  streamVideo(req, res, url, request, querystring);
 });
 
 // Start server
