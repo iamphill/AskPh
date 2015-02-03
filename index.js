@@ -53,7 +53,7 @@ app.get('/:video_id.MP4', function (req, res) {
     var videoUrl = videoString['url'];
 
     if (Array.isArray(videoUrl)) {
-      videoUrl = videoUrl[0];
+      videoUrl = videoUrl[2];
     }
 
     req.pipe(request(videoUrl)).pipe(res, {
