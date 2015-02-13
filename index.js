@@ -3,7 +3,8 @@ var express = require('express'),
       askph = require('./lib/askph.js'),
  askphVideo = require('./lib/askph-video.js'),
       chalk = require('chalk'),
-    cluster = require('cluster');;
+    cluster = require('cluster'),
+recruitment = require('./lib/recruitment.js');
 
 if(!String.linkify) {
   String.prototype.linkify = function() {
@@ -48,6 +49,13 @@ if (cluster.isMaster) {
 
     // Create new class
     new askph(req, res);
+  });
+
+  app.get('/feed/recruitment', function (req, res) {
+    console.log('REQ: Request for audio feed received');
+
+    // Create new class
+    new recruitment(req, res);
   });
 
   // Get video video
