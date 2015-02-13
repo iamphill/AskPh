@@ -74,12 +74,28 @@ console.log('app: ' + chalk.green('#AskPh Podcast Feed'));
 console.log('app: ' + '==========\napp: ');
 console.log('app: ' + ' ~~~> Starting app...');
 
-var server = app.listen(process.env.PORT || 3000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
+var server;
+var start = function () {
+  server = app.listen(process.env.PORT || 3000, function () {
+    var host = server.address().address;
+    var port = server.address().port;
 
-  console.log('app: ' + '\napp:  ~~~> Application has started.');
-  console.log('app: ' + ' ~~~> Listening on port %s', port);
-  console.log('app: ' + ' ~~~> Enjoy!\napp: ');
-  console.log('app: ' + ' ~~~> Logging requests received:');
-});
+    console.log('app: ' + '\napp:  ~~~> Application has started.');
+    console.log('app: ' + ' ~~~> Listening on port %s', port);
+    console.log('app: ' + ' ~~~> Enjoy!\napp: ');
+    console.log('app: ' + ' ~~~> Logging requests received:');
+  });
+};
+start();
+
+module.exports = {
+  restart: function () {
+    console.log('app:');
+    console.log('app:  ~~~> Stopping server');
+    server.close();
+    console.log('app:');
+    console.log('app:  ~~~> Restarting server');
+    start();
+  },
+   start: start
+};
