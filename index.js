@@ -89,13 +89,10 @@ var start = function () {
 start();
 
 module.exports = {
-  restart: function () {
+  stop: function () {
     console.log('app:');
     console.log('app:  ~~~> Stopping server');
     server.close();
-    console.log('app:');
-    console.log('app:  ~~~> Restarting server');
-    start();
   },
    start: start
 };
