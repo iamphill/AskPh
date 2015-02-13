@@ -1,5 +1,5 @@
 {
-  "playlist_id": "72096464",
+  "playlist_id": "80620639",
   "endpoint": "http://api.soundcloud.com/playlists/[PLAYLIST_ID].json?client_id=[CLIENT_ID]",
   "ytendpoint": "https://gdata.youtube.com/feeds/api/users/PhCreativeVideo/uploads?alt=json&max-results=50&start-index=1&prettyprint=false&q=askph",
   "videoinfo": "http://www.youtube.com/get_video_info?video_id=",
