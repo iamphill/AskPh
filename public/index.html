@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html ng-app="AskPh">
 <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ph.Podcast</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+
+  <script src="/javascript/lib/x2js.js"></script>
   <script src="/javascript/lib/angular.js"></script>
+  <script src="/javascript/lib/angular-xml.js"></script>
+  <script src="/javascript/lib/sanitize.js"></script>
   <script src="/javascript/app.js"></script>
   <script src="/javascript/controller.js"></script>
 </head>
 <body>
   <div ng-controller="AskPh.Controller.Main">
-    <div ng-repeat="item in items">
-      {{item.id}}
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div ng-repeat="item in items">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                {{ item.title }}
+              </div>
+              <div class="panel-body">
+                <p>
+                  {{ item.summary['__text'] }}
+                </p>
+                <audio ng-src="{{ trustSource(item['enclosure']['_url']) }}" controls></audio>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
