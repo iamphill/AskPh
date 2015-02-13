@@ -2,7 +2,8 @@ var express = require('express'),
         app = express(),
       askph = require('./lib/askph.js'),
  askphVideo = require('./lib/askph-video.js'),
-      chalk = require('chalk');
+      chalk = require('chalk'),
+    cluster = require('cluster');;
 
 if(!String.linkify) {
   String.prototype.linkify = function() {
@@ -28,89 +29,102 @@ if (process.env['client_id'] == undefined) {
   env(__dirname + '/.env');
 }
 
-app.use(express.static(process.cwd() + '/public'));
-// Listen for the feed URL
-app.get('/feed', function (req, res) {
-  console.log('REQ: Request for audio feed received');
+if (cluster.isMaster) {
+  var cpuCount = require('os').cpus().length;
 
-  // Create new class
-  new askph(req, res);
-});
+  // Create a worker for each CPU
+  for (var i = 0; i < cpuCount; i += 1) {
+    cluster.fork();
+  }
 
-// Get video video
-app.get('/feed/video', function (req, res) {
-  console.log('REQ: Request for video feed received');
+  cluster.on('exit', function (worker) {
+    cluster.fork();
+  });
+} else {
+  app.use(express.static(process.cwd() + '/public'));
+  // Listen for the feed URL
+  app.get('/feed', function (req, res) {
+    console.log('REQ: Request for audio feed received');
 
-  // Create new class
-  new askphVideo(req, res);
-});
+    // Create new class
+    new askph(req, res);
+  });
 
-app.get('/:track_id.mp3', function (req, res) {
-  var request = require('request');
-  var settings = require('./lib/settings.json');
+  // Get video video
+  app.get('/feed/video', function (req, res) {
+    console.log('REQ: Request for video feed received');
 
-  var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + process.env['client_id'];
-  console.log('REQ: Request for track ID `%s` received', req.params.track_id);
+    // Create new class
+    new askphVideo(req, res);
+  });
 
-  req.pipe(request(url)).pipe(res);
-});
+  app.get('/:track_id.mp3', function (req, res) {
+    var request = require('request');
+    var settings = require('./lib/settings.json');
 
-// Get the video
-var streamVideo = function (req, res, url, request, querystring) {
-  request(url, function (err, response, body) {
-    var qstring = querystring.parse(body);
-    var videoString = querystring.parse(qstring['url_encoded_fmt_stream_map']);
-    var videoUrl = videoString['url'];
+    var url = 'https://api.soundcloud.com/tracks/' + req.params.track_id + '/stream?client_id=' + process.env['client_id'];
+    console.log('REQ: Request for track ID `%s` received', req.params.track_id);
 
-    if (Array.isArray(videoUrl)) {
-      videoUrl = videoUrl[2];
-    }
+    req.pipe(request(url)).pipe(res);
+  });
 
-    request.get(videoUrl).on('response', function (respon) {
-      if (respon.statusCode === 403) {
-        streamVideo(req, res, url, request, querystring);
-      } else {
-        req.pipe(request(videoUrl)).pipe(res);
+  // Get the video
+  var streamVideo = function (req, res, url, request, querystring) {
+    request(url, function (err, response, body) {
+      var qstring = querystring.parse(body);
+      var videoString = querystring.parse(qstring['url_encoded_fmt_stream_map']);
+      var videoUrl = videoString['url'];
+
+      if (Array.isArray(videoUrl)) {
+        videoUrl = videoUrl[2];
       }
+
+      request.get(videoUrl).on('response', function (respon) {
+        if (respon.statusCode === 403) {
+          streamVideo(req, res, url, request, querystring);
+        } else {
+          req.pipe(request(videoUrl)).pipe(res);
+        }
+      });
     });
+  };
+  app.get('/:video_id.MP4', function (req, res) {
+    var request = require('request');
+    var querystring = require('querystring');
+    var settings = require('./lib/settings.json');
+    var id = req.params.video_id;
+    var url = settings['videoinfo'] + id + '&asv=3';
+
+    console.log('REQ: Request for video ID `%s` received', id);
+
+    streamVideo(req, res, url, request, querystring);
   });
-};
-app.get('/:video_id.MP4', function (req, res) {
-  var request = require('request');
-  var querystring = require('querystring');
-  var settings = require('./lib/settings.json');
-  var id = req.params.video_id;
-  var url = settings['videoinfo'] + id + '&asv=3';
 
-  console.log('REQ: Request for video ID `%s` received', id);
+  // Start server
+  console.log('app: ' + chalk.green('#AskPh Podcast Feed'));
+  console.log('app: ' + '==========\napp: ');
+  console.log('app: ' + ' ~~~> Starting app...');
 
-  streamVideo(req, res, url, request, querystring);
-});
+  var server;
+  var start = function () {
+    server = app.listen(process.env.PORT || 3000, function () {
+      var host = server.address().address;
+      var port = server.address().port;
 
-// Start server
-console.log('app: ' + chalk.green('#AskPh Podcast Feed'));
-console.log('app: ' + '==========\napp: ');
-console.log('app: ' + ' ~~~> Starting app...');
+      console.log('app: ' + '\napp:  ~~~> Application has started.');
+      console.log('app: ' + ' ~~~> Listening on port %s', port);
+      console.log('app: ' + ' ~~~> Enjoy!\napp: ');
+      console.log('app: ' + ' ~~~> Logging requests received:');
+    });
+  };
+  start();
 
-var server;
-var start = function () {
-  server = app.listen(process.env.PORT || 3000, function () {
-    var host = server.address().address;
-    var port = server.address().port;
-
-    console.log('app: ' + '\napp:  ~~~> Application has started.');
-    console.log('app: ' + ' ~~~> Listening on port %s', port);
-    console.log('app: ' + ' ~~~> Enjoy!\napp: ');
-    console.log('app: ' + ' ~~~> Logging requests received:');
-  });
-};
-start();
-
-module.exports = {
-  stop: function () {
-    console.log('app:');
-    console.log('app:  ~~~> Stopping server');
-    server.close();
-  },
-   start: start
-};
+  module.exports = {
+    stop: function () {
+      console.log('app:');
+      console.log('app:  ~~~> Stopping server');
+      server.close();
+    },
+     start: start
+  };
+}
